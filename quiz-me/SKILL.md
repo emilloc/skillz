@@ -1,52 +1,63 @@
 ---
 name: quiz-me
-description: Turn any research, investigation, or learning target into a question loop. The agent asks, the user tries, a correct attempt advances, a stuck user gets the smallest hint that unblocks them, never the answer. Domain-agnostic. Works on a codebase, a paper, a bug, a security finding, a proof, a dataset, or a topic. Use when the user types /quiz-me, or says quiz me, make it quiz me, ask me instead of telling me, Socratic mode, walk me through this by asking, or wants to learn the method instead of reading the result.
+description: Test understanding through one question at a time, attempts, and graduated hints. Use when the user explicitly requests quiz-me or a quiz session. Use tutor-me for first explanations.
 ---
 
 # Quiz me
 
-An agent that answers builds recognition in the user. An agent that asks builds recall. This skill makes the agent ask.
-
-The whole method is one loop:
-
-```
-It asks -> You try -> correct -> You solved it -> next question
-                   -> stuck   -> smallest hint -> You try again
-```
-
-## Rules
-
-1. Ask one question at a time. Then wait for the attempt.
-2. Never give the answer before the user commits an attempt. "I don't know" is not an attempt. Ask for a guess.
-3. Grade the attempt. Say "correct", "partly", or "no". Then give one sentence on why.
-4. On correct: state the principle the user just used in one sentence. Then ask the next question.
-5. On stuck: give the smallest hint that unblocks. One fact, one pointer, or one narrowing. Not the solution.
-6. Each further hint on the same question is one step bigger than the last. Never skip to the answer.
-7. If the user says "reveal" or "just tell me": give the answer and the full reasoning. Then ask one new question that uses that answer, so it does not stay passive.
-8. Order the questions along the path an expert would reason. Each question builds on the last.
-9. If you do not know the answer yourself, say so. The question then becomes how to find out. Grade the method, not the result.
+Help the user retrieve and apply what they know. Keep answers hidden until the user solves the question or requests a reveal.
 
 ## Start
 
-The user gives a target: a file, a finding, a paper, a problem, or a topic. Read what you must to know the answers. Do not summarize the target. Ask the first question.
+Use the target and learning goal already supplied. If the target is missing, ask what to quiz and wait.
+Inspect only the material needed to establish the answers and plan a bounded sequence of questions.
+Use accessible evidence to grade answers. Disclose uncertainty and test how to find an answer when the evidence is incomplete.
+Do not run example commands or modify the target unless the user requests that work.
 
-The first question is the first thing an expert would check. It is never a definition.
+Begin with an accessible application question. Ask a prerequisite question first when the user's attempt exposes a gap.
+Do not summarize the answers before asking.
 
-## Stuck
+## Ask and wait
 
-The user is stuck when they say stuck, hint, help, or I don't know, or after two wrong attempts on the same question.
+Ask one question per turn and wait for the user's response.
+Invite an optional confidence rating of sure, likely, or guess. Do not block progress if the user omits it.
+Do not invent the user's attempt or continue the sequence without their response.
 
-## Hint ladder
+## Respond to an attempt
 
-Give the first rung that would unblock. Give one rung per turn.
+Grade the attempt as correct, partly, or incorrect. Accept equivalent reasoning and valid alternative solutions.
+Explain the judgment briefly. For incomplete or incorrect attempts, identify the gap without disclosing the missing answer.
+If the user gives a confident wrong answer, identify the mismatch and give a hint. Reveal the correction only when requested.
 
-1. Narrow where to look. "Look at how the input reaches line 40."
-2. Name the category. "This is an ordering problem."
-3. Give one fact the user is missing.
-4. Ask a smaller sub-question whose answer is one step toward the big one.
+After a correct answer, ask the user to explain the principle when that would test understanding beyond guessing.
+Wait for that explanation before asking the next question. If the attempt already explains the principle, proceed to the next question.
+Correct factual mistakes once the answer has been solved or revealed.
 
-Never give the answer, a worked solution, or more than one rung at once.
+## Help when stuck
 
-## End
+Treat "hint", "help", "stuck", "I don't know", or two wrong attempts as a request for support.
+Do not require a guess before helping. Give one hint, then wait for another attempt.
+Start with the least revealing hint that can help. Increase support when the user remains stuck:
 
-Stop when the target is covered or the user says stop. Then list the questions the user solved unaided, the ones that needed hints, and the ones revealed. That list is the learning record.
+1. Identify where to look.
+2. Identify the kind of problem.
+3. Supply a missing prerequisite fact without stating the answer.
+4. Ask a smaller question that leads toward the answer.
+
+Give less support after unaided success. Restore support when a new difficulty appears.
+Do not jump to a more revealing hint because earlier questions were easy.
+If further help would reveal the answer, ask whether the user wants a reveal.
+
+## Reveal and revisit
+
+When the user says "reveal" or "just tell me", give the answer and the reasoning without requiring an attempt.
+Ask one short transfer question if the user still wants to continue the quiz.
+Revisit difficult concepts later using a changed example. Skip repetition when the user requests a short session.
+
+## Stop or switch
+
+Follow the user's request to stop, change topic, receive a direct answer, or switch learning modes immediately.
+Do not append a new question after a stop request or a request for only the answer.
+When a session ends, give a brief record in chat of unaided answers, hints, reveals, and confident errors that actually occurred.
+Omit the record if the user asks to stop without a summary. Do not save it to a file without a request.
+Suggest revisiting missed concepts later without creating a reminder or schedule.
